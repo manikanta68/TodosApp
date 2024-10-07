@@ -1,0 +1,61 @@
+.each-todo{
+    width: 100%;
+    color: white;
+    margin-bottom: 10px;
+    background-color: orange;
+    padding: 10px;
+    border-radius: 4px;
+    font-family: "Roboto";
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    max-width: 700px;
+}
+.each-todo:nth-child(2n){
+   background-color: rgb(136, 189, 238);
+}
+.delete-button{
+    margin-left: 15px;
+    cursor: pointer;
+}
+.edit-input{
+    outline: none;
+    border: none;
+}
+.save-button{
+    outline: none;
+    border: none;
+    border-radius: 2px;
+    background-color: lightgreen;
+    padding: 3px;
+    color: white;
+}
+
+.todo-text{
+  overflow-x: scroll;
+  width: 200;
+}
+@media screen and (min-width:540px) {
+    .todo-text{
+        max-width: 500px;
+        margin-left: 10px;
+    }
+}
+
+
+.todo-text::-webkit-scrollbar{
+    display: none;
+}
+.todo-text {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+@media  screen and (min-width: 540px) {
+    .text-container{
+        display: flex;
+    }
+}
+.todo-strike{
+    text-decoration: line-through;
+    text-decoration-color: black;
+}
