@@ -18,9 +18,14 @@
     margin-left: 15px;
     cursor: pointer;
 }
+.checkbox{
+    margin-right: 4px;
+}
 .edit-input{
     outline: none;
     border: none;
+    padding: 5px;
+    border-radius:2px;
 }
 .save-button{
     outline: none;
@@ -34,11 +39,16 @@
 .todo-text{
   overflow-x: scroll;
   width: 200;
+  color: whitesmoke;
+}
+.todo-text::first-letter{
+   text-transform: uppercase;
 }
 @media screen and (min-width:540px) {
     .todo-text{
         max-width: 500px;
-        margin-left: 10px;
+        margin-left: 5px;
+        font-size: 20px;
     }
 }
 
@@ -57,5 +67,7 @@
 }
 .todo-strike{
     text-decoration: line-through;
+    text-decoration-thickness: 0.9px;
     text-decoration-color: black;
+
 }

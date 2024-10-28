@@ -26,13 +26,28 @@
 .todo-heading{
     color: white;
     margin: 10px;
-    font-size: 17px;
+    font-size: 16px;
 }
 @media screen and (min-width:540px) {
     .todo-heading{
         font-size: 25px;
     }
 }
+.todo-heading {
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typing 2s steps(20, end) forwards;
+    font-family: monospace;
+    width: 27ch; 
+  }
+  
+  @keyframes typing {
+    from { width: 0; }
+    to { width: 27ch; }
+  }
+    
+
+
 .search-bar{
     border: solid 2px blueviolet;
     width: 100%;
@@ -70,4 +85,50 @@
     .todo-list-container{
         margin-top: 30px;
     }
+}
+.successview-container{
+    margin: 10px;
+}
+.searcbar-container{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    background-color: white;
+    border-radius: 3px;
+    height: 30px;
+}
+.search-input{
+    border: none;
+    outline: none;
+    padding: 2px;
+    margin: 4px;
+}
+.search-button{
+    border: none;
+    outline: none;
+    padding: 3px;
+    height: 100%;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+.filters-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.complete-button{
+   padding: 3px;
+}
+.incomplete-button{
+   padding: 3px;
+}
+.filters-bg-container{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.label{
+    color: white;
 }

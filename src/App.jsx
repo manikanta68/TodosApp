@@ -1,102 +1,180 @@
-import { useEffect, useState } from "react"
-import { v4 as uuidv4 } from 'uuid';
+import { useEffect, useState } from "react";
 import EachTodo from "./components/EachTodo";
-import "./App.css"
+import { ThreeDots } from 'react-loader-spinner';
+import "./App.css";
 
-
-const todoList = [
-    {
-        id: uuidv4(),
-        text: "learn Html",
-        check: false
-    }, {
-        id: uuidv4(),
-        text: "learn css",
-        check: false
-    },
-    {
-        id: uuidv4(),
-        text: "learn java",
-        check: false
-    }, {
-        id: uuidv4(),
-        text: "learn react",
-        check: false
-    },
-    {
-        id: uuidv4(),
-        text: "learn php",
-        check: false
-    }, {
-        id: uuidv4(),
-        text: "learn python",
-        check: false
-    },
-
-
-]
+const apiStatusConstants = {
+    initial: "INITIAL",
+    inProgress: "IN_PROGRESS",
+    success: "SUCCESS",
+    failure: "FAILURE"
+};
 
 const App = () => {
-    const [newList,setNewList] = useState(localStorage.getItem("TodoList") !== null ? JSON.parse(localStorage.getItem("TodoList")) :todoList)
-    const [input, setInput] = useState("")
+    const [apiResponse, setApiResponse] = useState({
+        status: apiStatusConstants.initial,
+        data: null,
+        errorMsg: null
+    });
+    const [name, setName] = useState("")
+    console.log(apiResponse.data)
 
     useEffect(() => {
-       localStorage.setItem("TodoList",JSON.stringify(newList))
-    },[newList])
+        setApiResponse((prev) => ({
+            ...prev,
+            status: apiStatusConstants.inProgress,
+        }));
+        const fetchData = async () => {
+            const url = "https://todosbackend-production.up.railway.app/todos/";
+            try {
+                const response = await fetch(url);
+                const responseData = await response.json();
+                if (response.ok) {
+                    setApiResponse({
+                        status: apiStatusConstants.success,
+                        data: responseData,
+                        errorMsg: null,
+                    })
+                }
 
+            } catch (error) {
+                setApiResponse((prev) => ({
+                    ...prev,
+                    errorMsg: error,
+                    status: apiStatusConstants.failure,
+                }));
+            }
+        };
 
+        fetchData();
+    }, []);
 
-
-
-    const onChangeInput = (event) => {
-        setInput(event.target.value)
-    }
-    const onAddTodo = () => {
+    const onAddItem = async () => {
         const newTodo = {
-            id: uuidv4(),
-            text: input,
-            check: false
+            name: name,
+            status: "Incomplete"
         }
-        setNewList([...newList,newTodo]) 
-    }
-    const deleteTodo = (id) => {
-       const filterList = newList.filter(each => each.id !== id)
-       setNewList(filterList)
-    }
+        const response = await fetch('https://todosbackend-production.up.railway.app/todos/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newTodo),
+        });
+        const newItem = await response.json();
+        setApiResponse(prev => ({
+            prev,
+            status: apiStatusConstants.success,
+            data: [...prev.data, newItem]
+        }))
+        setName('');
+    };
 
-    const editTodo = (obj) => {
-        setNewList(newList.map(each => {
-            if(each.id === obj.id){
+    const updateTodo = async (obj) => {
+        console.log(obj)
+        const response = await fetch(`https://todosbackend-production.up.railway.app/todos/${obj.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(obj),
+        });
+        const updateStatusResponse = await response.json()
+        console.log(updateStatusResponse.updateStatus);
+        const updateData = apiResponse.data.map((each) => {
+            if (each.id === obj.id) {
                 return obj
+
+
             }
             return each
-        } ))
+        })
+        setApiResponse((prev) => ({
+            ...prev, data: updateData
+        }))
+    };
+
+    const deleteTodo = async (id) => {
+        const response = await fetch(`https://todosbackend-production.up.railway.app/todos/${id}`, { method: 'DELETE' });
+        const deleteStatusResponse = await response.json()
+        console.log(deleteStatusResponse.deleteStatus, deleteStatusResponse.id);
+        const updatedData = apiResponse.data.filter((each) => each.id !== id)
+        setApiResponse((prev) => ({
+            ...prev, data: updatedData
+        }))
+    };
+
+    const renderSuccessView = () => {
+        const { data } = apiResponse;
+        return (
+            <div className="successview-container">
+                <div className="filters-bg-container">
+                    <div className="searcbar-container">
+                        <input type="text" className="search-input" />
+                        <button type="button" className="search-button">Search</button>
+                    </div>
+                    <div className="filters-container">
+                        <input type="radio" />
+                        <label className="label">Complete</label>
+                        <input type="radio" />
+                        <lable className="label">Incomplete</lable>
+                        
+                    </div>
+                </div>
+                <ul className="todo-list-container">
+                    {data.map((each) => (
+                        <EachTodo key={each.id} eachObj={each} updateTodo={updateTodo} deleteTodo={deleteTodo} />
+                    ))}
+                </ul>
+            </div>
+        );
+    };
+
+    const renderLoadingView = () => (
+        <ThreeDots
+            visible={true}
+            height="80"
+            width="80"
+            color="#4fa94d"
+            radius="9"
+            ariaLabel="three-dots-loading"
+        />
+    );
+
+    const renderFailureView = () => {
+        const { errorMsg } = apiResponse
+        return <p>Error: {errorMsg}</p>;
+
+    }
+    const renderTodos = () => {
+        const { status } = apiResponse;
+        switch (status) {
+            case apiStatusConstants.inProgress:
+                return renderLoadingView();
+            case apiStatusConstants.success:
+                return renderSuccessView();
+            case apiStatusConstants.failure:
+                return renderFailureView();
+            default:
+                return null;
+        }
+    };
+
+    const onInputField = (event) => {
+        setName(event.target.value)
     }
 
-    const  checkTodo = (id) => {
-          setNewList(newList.map(each => {
-            if(each.id === id){
-               return {...each,check: !each.check}
-            }
-            return each
-          } ))
-    }
 
     return (
         <div className="app-background">
             <div className="todo-background">
                 <h1 className="todo-heading">What's The plan for Today?</h1>
                 <div className="search-bar">
-                    <input type="text" placeholder="Add a todo" value={input} onChange={onChangeInput} className="input-field" />
-                    <button type="button" className="add-button" onClick={onAddTodo}>Add Todo</button>
+                    <input type="text" value={name} onChange={onInputField} placeholder="Add a todo" className="input-field" />
+                    <button type="button" onClick={onAddItem} className="add-button">Add Todo</button>
                 </div>
-                <ul className="todo-list-container">
-                    {newList.map((each) => <EachTodo key={each.id} eachObj={each} delete={deleteTodo} edit={editTodo} check={checkTodo} />)}
-                </ul>
+                {renderTodos()}
             </div>
         </div>
-    )
-}
+    );
+};
 
-
-export default App
+export default App;
