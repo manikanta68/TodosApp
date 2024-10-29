@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 import EachTodo from "./components/EachTodo";
 import { ThreeDots } from 'react-loader-spinner';
 import "./App.css";
@@ -17,6 +18,10 @@ const App = () => {
         errorMsg: null
     });
     const [name, setName] = useState("")
+    const [searchInput, setSearchInput] = useState("")
+    const [search, setSearch] = useState(false)
+    const [selected, setSelected] = useState('');
+
     console.log(apiResponse.data)
 
     useEffect(() => {
@@ -25,7 +30,7 @@ const App = () => {
             status: apiStatusConstants.inProgress,
         }));
         const fetchData = async () => {
-            const url = "https://todosbackend-production.up.railway.app/todos/";
+            const url = `${backendUrl}/todos/?search_q=${searchInput}&filter_by=${selected}`;
             try {
                 const response = await fetch(url);
                 const responseData = await response.json();
@@ -44,17 +49,21 @@ const App = () => {
                     status: apiStatusConstants.failure,
                 }));
             }
+            setSearchInput("")
+
         };
 
         fetchData();
-    }, []);
+        setSearch(false)
+
+    }, [search,selected]);
 
     const onAddItem = async () => {
         const newTodo = {
             name: name,
             status: "Incomplete"
         }
-        const response = await fetch('https://todosbackend-production.up.railway.app/todos/', {
+        const response = await fetch(`${backendUrl}/todos/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -72,7 +81,7 @@ const App = () => {
 
     const updateTodo = async (obj) => {
         console.log(obj)
-        const response = await fetch(`https://todosbackend-production.up.railway.app/todos/${obj.id}`, {
+        const response = await fetch(`${backendUrl}/todos/${obj.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(obj),
@@ -93,7 +102,7 @@ const App = () => {
     };
 
     const deleteTodo = async (id) => {
-        const response = await fetch(`https://todosbackend-production.up.railway.app/todos/${id}`, { method: 'DELETE' });
+        const response = await fetch(`${backendUrl}/todos/${id}`, { method: 'DELETE' });
         const deleteStatusResponse = await response.json()
         console.log(deleteStatusResponse.deleteStatus, deleteStatusResponse.id);
         const updatedData = apiResponse.data.filter((each) => each.id !== id)
@@ -102,22 +111,40 @@ const App = () => {
         }))
     };
 
+    const onSearchInput = (event) => {
+        setSearchInput(event.target.value)
+    }
+    const onSearch = () => {
+        setSearch((prev) => !prev.search)
+    }
+    const handleSelectChange = (event) => {
+        setSelected(event.target.value);
+      };
+    
+
+
     const renderSuccessView = () => {
         const { data } = apiResponse;
         return (
             <div className="successview-container">
                 <div className="filters-bg-container">
-                    <div className="searcbar-container">
-                        <input type="text" className="search-input" />
-                        <button type="button" className="search-button">Search</button>
+                    {
+                        data.length > 0 && <div className="searcbar-container">
+                            <input type="text" placeholder="Search by todo name" className="search-input" value={searchInput} onChange={onSearchInput} />
+                            <button type="button" className="search-button" onClick={onSearch}>Search</button>
+                        </div>
+                    }
+                    {
+                        data.length > 0 &&  <div className="filters-container">
+                        <label htmlFor="filter">Filter by:</label>
+                        <select id="filter" value={selected} onChange={handleSelectChange} className="select-container">
+                            <option value="">default</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Incomplete">Incomplete</option>
+                        </select>
                     </div>
-                    <div className="filters-container">
-                        <input type="radio" />
-                        <label className="label">Complete</label>
-                        <input type="radio" />
-                        <lable className="label">Incomplete</lable>
-                        
-                    </div>
+                    }
+                   
                 </div>
                 <ul className="todo-list-container">
                     {data.map((each) => (
