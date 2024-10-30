@@ -55,7 +55,7 @@
     border-radius: 3px;
     display: flex;
     align-items: center;
-    max-width: 600px;
+    max-width: 700px;
 }
 .input-field{
     background-color:transparent;
@@ -80,12 +80,22 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    height: 50vh;
+    overflow-y: scroll;
 }
 @media screen and (min-width:540px) {
     .todo-list-container{
         margin-top: 30px;
+        
     }
 }
+.todo-list-container::-webkit-scrollbar{
+    display: none;
+}
+.todo-list-container {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 .successview-container{
     margin: 10px;
     width: 100%;
@@ -129,7 +139,7 @@
     justify-content: center;
     flex-wrap: wrap;
     width: 100%;
-    max-width: 600px;
+    max-width: 700px;
 }
 @media screen and (min-width:540px) {
    .filters-bg-container{

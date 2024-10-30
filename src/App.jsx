@@ -168,6 +168,7 @@ const App = () => {
 
     const renderFailureView = () => {
         const { errorMsg } = apiResponse
+        console.log(errorMsg)
         return <p>Error: {errorMsg}</p>;
 
     }
