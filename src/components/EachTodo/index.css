@@ -11,6 +11,7 @@
     justify-content: space-between;
     max-width: 700px;
 }
+
 .each-todo:nth-child(2n){
    background-color: rgb(136, 189, 238);
 }

@@ -74,7 +74,7 @@ const App = () => {
         setApiResponse(prev => ({
             prev,
             status: apiStatusConstants.success,
-            data: [...prev.data, newItem]
+            data: [newItem,...prev.data]
         }))
         setName('');
     };
